@@ -1,6 +1,6 @@
 class AppLink {
-  static const String server = "http://192.168.77.30:8000/api";
-  static const String images = "http://192.168.77.30:8000";
+static const String server = "https://lavender-porcupine-249016.hostingersite.com/api";
+  static const String images = "https://lavender-porcupine-249016.hostingersite.com/";
 
   static const String test = "$server/test.php";
   //////////////////Auth///////////////////
