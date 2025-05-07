@@ -45,7 +45,7 @@ class AboutDevelopersScreen extends StatelessWidget {
               ),
                 _buildDeveloperCard(
                 name: 'معاذ عباس',
-                role: 'مطور تطبيقات Flutter',
+                role: 'Taster',
                 email: 'mouaz.abbas.2000@gmail.com',
                 imagePath: 'assets/images/moaaz.jpg',
                 isTablet: isTablet,
