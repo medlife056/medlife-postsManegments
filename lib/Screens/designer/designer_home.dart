@@ -48,7 +48,7 @@ class DesignerHomeScreen extends StatelessWidget {
             children: [
               _AnimatedCard(
                 icon: Icons.design_services,
-                label: 'غير مصممة لكل خلية',
+                label: 'عدد المنشورات ',
                 color: AppColors.primary,
                 onTap: () {
                   Get.delete<UndesignedcounterController>();
@@ -57,7 +57,7 @@ class DesignerHomeScreen extends StatelessWidget {
               ),
               _AnimatedCard(
                 icon: Icons.history,
-                label: 'تصاميمي السابقة',
+                label: 'المنشورات غير المصممة',
                 color: Colors.indigo.shade200,
                 onTap: () {
                   Get.delete<DesignerCellsController>();

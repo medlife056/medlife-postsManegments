@@ -39,7 +39,9 @@ class CoordinaterHomeScreen extends StatelessWidget {
           ),
         ),
         body: Padding(
-          padding: EdgeInsets.all(isTablet ? heightScreen * 0.03 : heightScreen * 0.02),
+          padding: EdgeInsets.all(
+            isTablet ? heightScreen * 0.03 : heightScreen * 0.02,
+          ),
           child: GridView.count(
             crossAxisCount: isTablet ? 3 : 2,
             crossAxisSpacing: isTablet ? widthScreen * 0.05 : 16,
@@ -47,7 +49,7 @@ class CoordinaterHomeScreen extends StatelessWidget {
             children: [
               _AnimatedCard(
                 icon: Icons.design_services,
-                label: 'غير منسقة لكل خلية',
+                label: 'عدد المنشورات',
                 color: AppColors.primary,
                 onTap: () {
                   Get.delete<UnCoordinatercounterController>();
@@ -56,7 +58,7 @@ class CoordinaterHomeScreen extends StatelessWidget {
               ),
               _AnimatedCard(
                 icon: Icons.history,
-                label: 'تنسيقاتي السابقة',
+                label: 'المنشورات الغير منسقة',
                 color: Colors.indigo.shade200,
                 onTap: () {
                   Get.delete<CoordinaterCellsController>();
@@ -70,9 +72,8 @@ class CoordinaterHomeScreen extends StatelessWidget {
                 onTap: () {
                   LogoutService().logout();
                 },
-                
               ),
-               _AnimatedCard(
+              _AnimatedCard(
                 icon: Icons.developer_mode,
                 label: 'حول المطورون',
                 color: Colors.grey.shade400,

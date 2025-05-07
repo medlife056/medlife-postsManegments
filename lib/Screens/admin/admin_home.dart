@@ -61,7 +61,7 @@ class AdminHomeScreen extends StatelessWidget {
               ),
               _AnimatedCard(
                 icon: Icons.post_add,
-                label: 'تقرير المنشورات الغير المنشورة',
+                label: 'عدد المنشورات لكل خلية',
                 color: Color(0xFF102A43),
                 iconSize: width * 0.08,
                 fontSize: width * 0.04,
