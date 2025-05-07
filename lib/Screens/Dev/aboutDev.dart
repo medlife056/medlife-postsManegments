@@ -30,6 +30,13 @@ class AboutDevelopersScreen extends StatelessWidget {
           child: ListView(
             children: [
               _buildDeveloperCard(
+                name: 'خوله مقداد محمد',
+                role: 'Project Manager',
+                email: 'Khoula77123@gmail.com',
+                imagePath: 'assets/images/khaola.jpg',
+                isTablet: isTablet,
+              ),
+              _buildDeveloperCard(
                 name: 'قصي الحشيش',
                 role: 'Mobile Application Developer | Flutter',
                 email: 'qusayhash@gmail.com',
@@ -43,20 +50,14 @@ class AboutDevelopersScreen extends StatelessWidget {
                 imagePath: 'assets/images/omar.jpg',
                 isTablet: isTablet,
               ),
-                _buildDeveloperCard(
+              _buildDeveloperCard(
                 name: 'معاذ عباس',
                 role: 'Taster',
                 email: 'mouaz.abbas.2000@gmail.com',
                 imagePath: 'assets/images/moaaz.jpg',
                 isTablet: isTablet,
               ),
-                _buildDeveloperCard(
-                name: 'خوله مقداد محمد',
-                role: 'Project Manager',
-                email: 'Khoula77123@gmail.com',
-                imagePath: 'assets/images/khaola.jpg',
-                isTablet: isTablet,
-              ),
+
               const SizedBox(height: 24),
               Center(
                 child: Text(
@@ -90,7 +91,7 @@ class AboutDevelopersScreen extends StatelessWidget {
         contentPadding: const EdgeInsets.all(16),
         leading: CircleAvatar(
           radius: 30,
-          backgroundImage: AssetImage(imagePath)
+          backgroundImage: AssetImage(imagePath),
         ),
         title: Text(
           name,
