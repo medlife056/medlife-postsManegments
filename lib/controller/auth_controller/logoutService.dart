@@ -25,6 +25,7 @@ class LogoutService {
     if (response['message'] == "Logged out successfully") {
       await prefs.remove('access_token');
       await prefs.remove('cellId');
+      await prefs.remove('role');
 
       Get.snackbar("نجاح", "تم تسجيل الخروج بنجاح");
       Get.offAll(LoginScreen());

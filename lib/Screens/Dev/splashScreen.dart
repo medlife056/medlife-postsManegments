@@ -1,8 +1,13 @@
 import 'dart:async';
+import 'package:MedLife/Screens/admin/admin_home.dart';
 import 'package:MedLife/Screens/auth/Login.dart';
+import 'package:MedLife/Screens/content_writer/contentWriterHomeScreen.dart';
+import 'package:MedLife/Screens/coordinater/coordinater_home.dart';
+import 'package:MedLife/Screens/designer/designer_home.dart';
 import 'package:MedLife/constant/appColors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -15,8 +20,28 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(seconds: 3), () {
-      Get.off(() => LoginScreen());
+    Timer(const Duration(seconds: 3), () async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('access_token');
+      String? role = prefs.getString('role');
+
+      if (token != null) {
+        if (role == 'admin') {
+          Get.offAll(() => AdminHomeScreen());
+        }
+        if (role == 'design') {
+          Get.offAll(() => DesignerHomeScreen());
+        }
+        if (role == 'coordinate') {
+          Get.offAll(() => CoordinaterHomeScreen());
+        }
+        if (role == 'content_writer') {
+          Get.offAll(() => ContentWriterHomeScreen());
+        }
+      } else {
+        Get.offAll(() => LoginScreen());
+      }
+      ;
     });
   }
 
