@@ -47,14 +47,14 @@ class LoginScreen extends StatelessWidget {
                       ),
                     )),
                 const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
-                    Text("Don't have an account?"),
-                    Text("Forget Password",
-                        style: TextStyle(color: AppColors.primary)),
-                  ],
-                ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //   children: const [
+                //     Text("Don't have an account?"),
+                //     Text("Forget Password",
+                //         style: TextStyle(color: AppColors.primary)),
+                //   ],
+                // ),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () => controller.login(),

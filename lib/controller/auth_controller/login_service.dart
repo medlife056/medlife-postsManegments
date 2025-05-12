@@ -77,7 +77,7 @@ class AuthService {
     } catch (e) {
       Get.defaultDialog(
         title: 'استثناء',
-        middleText: e.toString(),
+        middleText: 'اسم المستخدم او كلمة المرور خطأ',
         textConfirm: 'موافق',
         confirmTextColor: Colors.white,
         onConfirm: () => Get.back(),
