@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:MedLife/constant/appColors.dart';
 import 'package:MedLife/models/postModel.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' hide TextDirection;
 
 class PostDetailsScreen extends StatelessWidget {
   final PostModel post;
@@ -15,7 +15,9 @@ class PostDetailsScreen extends StatelessWidget {
     final heightScreen = MediaQuery.of(context).size.height;
     final widthScreen = MediaQuery.of(context).size.width;
 
-    return Scaffold(
+      return Directionality(
+    textDirection: TextDirection.rtl,
+    child: Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
@@ -85,7 +87,7 @@ class PostDetailsScreen extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildDetailRow(IconData icon, String text, double widthScreen) {
