@@ -59,20 +59,39 @@ class AddPostScreen extends StatelessWidget {
                   decoration: const InputDecoration(labelText: "فكرة البوست"),
                 ),
                 const SizedBox(height: 16),
-                DropdownButtonFormField<int>(
-                  value: volunteerController.selectedVolunteerId.value,
-                  items: volunteerController.volunteers
-                      .map(
-                        (v) => DropdownMenuItem(
-                          value: v.id,
-                          child: Text(v.name),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (value) =>
-                      volunteerController.selectedVolunteerId.value = value,
-                  decoration: const InputDecoration(labelText: "اختر المتطوع"),
-                ),
+           Autocomplete<String>(
+  optionsBuilder: (TextEditingValue textEditingValue) {
+    if (textEditingValue.text.isEmpty) {
+      return const Iterable<String>.empty();
+    }
+
+    return volunteerController.volunteers
+        .map((v) => v.name)
+        .where((name) => name
+            .toLowerCase()
+            .startsWith(textEditingValue.text.toLowerCase()));
+  },
+  displayStringForOption: (option) => option,
+  fieldViewBuilder:
+      (context, textEditingController, focusNode, onEditingComplete) {
+    return TextFormField(
+      controller: textEditingController,
+      focusNode: focusNode,
+      decoration: const InputDecoration(
+        labelText: "اختر المتطوع",
+        border: OutlineInputBorder(),
+      ),
+    );
+  },
+  onSelected: (String selection) {
+    final selectedVolunteer = volunteerController.volunteers
+        .firstWhere((v) => v.name == selection);
+
+    volunteerController.selectedVolunteerId.value =
+        selectedVolunteer.id;
+  },
+)
+,
                 const SizedBox(height: 16),
                 Obx(
                   () => CheckboxListTile(
