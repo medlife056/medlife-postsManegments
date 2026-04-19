@@ -1,6 +1,6 @@
 class AppLink {
   static const String server = "https://medlifeposts.medlifesy.org/public/api";
-  static const String images = "https://lavender-porcupine-249016.hostingersite.com/";
+  static const String images = "https://medlifeposts.medlifesy.org/public/";
 
   static const String test = "$server/test.php";
   //////////////////Auth///////////////////

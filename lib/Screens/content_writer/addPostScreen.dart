@@ -42,10 +42,12 @@ class AddPostScreen extends StatelessWidget {
             ],
           ),
         ),
-        body: Obx(() {
-          if (volunteerController.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: Obx(() {
+  print(volunteerController.volunteers.map((v) => v.name).toList());
+  if (volunteerController.isLoading.value) {
+    return const Center(child: CircularProgressIndicator());
+  }
+ 
 
           return Padding(
             padding: EdgeInsets.symmetric(
@@ -59,39 +61,31 @@ class AddPostScreen extends StatelessWidget {
                   decoration: const InputDecoration(labelText: "فكرة البوست"),
                 ),
                 const SizedBox(height: 16),
-           Autocomplete<String>(
+     Autocomplete<String>(
   optionsBuilder: (TextEditingValue textEditingValue) {
-    if (textEditingValue.text.isEmpty) {
+    if (volunteerController.volunteers.isEmpty || textEditingValue.text.isEmpty)
       return const Iterable<String>.empty();
-    }
 
     return volunteerController.volunteers
-        .map((v) => v.name)
-        .where((name) => name
-            .toLowerCase()
-            .startsWith(textEditingValue.text.toLowerCase()));
+        .where((v) => v.name.toLowerCase().contains(textEditingValue.text.toLowerCase()))
+        .map((v) => v.name);
   },
   displayStringForOption: (option) => option,
-  fieldViewBuilder:
-      (context, textEditingController, focusNode, onEditingComplete) {
+  fieldViewBuilder: (context, textEditingController, focusNode, onEditingComplete) {
     return TextFormField(
       controller: textEditingController,
       focusNode: focusNode,
       decoration: const InputDecoration(
-        labelText: "اختر المتطوع",
+        labelText: "اكتب اسم المتطوع",
         border: OutlineInputBorder(),
       ),
     );
   },
   onSelected: (String selection) {
-    final selectedVolunteer = volunteerController.volunteers
-        .firstWhere((v) => v.name == selection);
-
-    volunteerController.selectedVolunteerId.value =
-        selectedVolunteer.id;
+    final selectedVolunteer = volunteerController.volunteers.firstWhere((v) => v.name == selection);
+    volunteerController.selectedVolunteerId.value = selectedVolunteer.id;
   },
-)
-,
+),
                 const SizedBox(height: 16),
                 Obx(
                   () => CheckboxListTile(

@@ -20,8 +20,9 @@ class Getvolunteerscontroller extends GetxController {
   Future<void> fetchVolunteers() async {
     try {
       isLoading.value = true;
-      final fetchedVolunteers = await _postService.getVolunteers();
-      volunteers.assignAll(fetchedVolunteers);
+     final fetchedVolunteers = await _postService.getVolunteers();
+print("Fetched volunteers: ${fetchedVolunteers.map((v) => v.name).toList()}"); // ✅ أضف هذا
+volunteers.assignAll(fetchedVolunteers);
     } catch (e) {
       errorMessage.value = "فشل في تحميل المتطوعين";
     } finally {
