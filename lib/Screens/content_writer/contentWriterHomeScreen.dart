@@ -60,7 +60,7 @@ class ContentWriterHomeScreen extends StatelessWidget {
                 icon: Icons.post_add,
                 onTap: () {
                   Get.delete<AddPostController>();
-                  Get.to(AddPostScreen());
+                  Get.to(()=>AddPostScreen());
                 },
                 backgroundColor: Color(0xFFFFE5EC),
                 iconColor: Color(0xFFFF5B7F),

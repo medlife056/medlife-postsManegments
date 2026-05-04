@@ -1,140 +1,147 @@
+import 'package:MedLife/controller/getVolunteers/getVolunteersController.dart';
+import 'package:MedLife/models/volunteer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:MedLife/constant/appColors.dart';
 import 'package:MedLife/controller/content_Writer/addPost/addPostController.dart';
-import '../../controller/getVolunteers/getVolunteersController.dart';
 
 class AddPostScreen extends StatelessWidget {
-  final AddPostController controller = Get.put(AddPostController());
-  final Getvolunteerscontroller volunteerController = Get.put(
-    Getvolunteerscontroller(),
-  );
-
   AddPostScreen({super.key});
+  final Getvolunteerscontroller volunteerController =
+      Get.put(Getvolunteerscontroller());
+  final AddPostController controller = Get.put(AddPostController());
+
 
   @override
   Widget build(BuildContext context) {
     final widthScreen = MediaQuery.of(context).size.width;
     final heightScreen = MediaQuery.of(context).size.height;
-
     final isTablet = widthScreen > 600;
 
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: Colors.white,
+
         appBar: AppBar(
+          title: const Text("كاتب المحتوى"),
           backgroundColor: Colors.white,
-          title: Row(
+        ),
+
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: ListView(
             children: [
-              Image.asset(
-                'assets/images/midlife logo.png',
-                height: isTablet ? heightScreen * 0.08 : heightScreen * 0.05,
-              ),
-              const SizedBox(width: 10),
-              Text(
-                "كاتب المحتوى",
-                style: TextStyle(
-                  color: AppColors.primary,
-                  fontSize: isTablet ? widthScreen * 0.06 : widthScreen * 0.05,
+              /// ================= فكرة البوست =================
+              TextField(
+                controller: controller.postIdeaController,
+                decoration: const InputDecoration(
+                  labelText: "فكرة البوست",
+                  border: OutlineInputBorder(),
                 ),
+              ),
+
+              const SizedBox(height: 16),
+
+              /// ================= LOADING GUARD =================
+         Obx(() {
+  final list = volunteerController.volunteers;
+
+  if (volunteerController.isLoading.value) {
+    return const Center(child: CircularProgressIndicator());
+  }
+
+  if (list.isEmpty) {
+    return const Text("لا يوجد متطوعين حالياً");
+  }
+
+  return Autocomplete<Volunteer>(
+    optionsBuilder: (TextEditingValue textEditingValue) {
+      final query = textEditingValue.text.trim().toLowerCase();
+
+      if (query.isEmpty) {
+        return list;
+      }
+
+      return list.where(
+        (v) => v.name.toLowerCase().contains(query),
+      );
+    },
+
+    displayStringForOption: (Volunteer option) => option.name,
+
+    fieldViewBuilder:
+        (context, textController, focusNode, onEditingComplete) {
+      return TextFormField(
+        controller: textController,
+        focusNode: focusNode,
+        decoration: const InputDecoration(
+          labelText: "اكتب لاختيار متطوع",
+          border: OutlineInputBorder(),
+        ),
+      );
+    },
+
+    onSelected: (Volunteer selection) {
+      volunteerController.selectedVolunteerId.value = selection.id;
+    },
+  );
+}),
+
+              const SizedBox(height: 16),
+
+              /// ================= CHECKBOXES =================
+              Obx(() => CheckboxListTile(
+                    title: const Text("هل يحتاج تنسيق؟"),
+                    value: controller.needsCoordination.value,
+                    onChanged: (v) =>
+                        controller.needsCoordination.value = v!,
+                  )),
+
+              Obx(() => CheckboxListTile(
+                    title: const Text("هل يحتاج تصميم؟"),
+                    value: controller.needsDesign.value,
+                    onChanged: (v) =>
+                        controller.needsDesign.value = v!,
+                  )),
+
+              Obx(() => CheckboxListTile(
+                    title: const Text("تم النشر؟"),
+                    value: controller.isPublished.value,
+                    onChanged: (v) =>
+                        controller.isPublished.value = v!,
+                  )),
+
+              const SizedBox(height: 16),
+
+              /// ================= زر الإرسال (بدون تغيير) =================
+              Obx(
+                () => controller.isSubmitting.value
+                    ? const Center(child: CircularProgressIndicator())
+                    : ElevatedButton(
+                        onPressed: () async {
+                          final id = volunteerController
+                              .selectedVolunteerId.value;
+
+                          if (id != null) {
+                            await controller.submitPost(id);
+                          } else {
+                            Get.snackbar(
+                                "خطأ", "الرجاء اختيار المتطوع");
+                          }
+                        },
+                        child: Text(
+                          "إضافة البوست",
+                          style: TextStyle(
+                            fontSize: isTablet
+                                ? widthScreen * 0.045
+                                : widthScreen * 0.04,
+                          ),
+                        ),
+                      ),
               ),
             ],
           ),
         ),
-      body: Obx(() {
-  print(volunteerController.volunteers.map((v) => v.name).toList());
-  if (volunteerController.isLoading.value) {
-    return const Center(child: CircularProgressIndicator());
-  }
- 
-
-          return Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: widthScreen * 0.05,
-              vertical: 16,
-            ),
-            child: ListView(
-              children: [
-                TextField(
-                  controller: controller.postIdeaController,
-                  decoration: const InputDecoration(labelText: "فكرة البوست"),
-                ),
-                const SizedBox(height: 16),
-     Autocomplete<String>(
-  optionsBuilder: (TextEditingValue textEditingValue) {
-    if (volunteerController.volunteers.isEmpty || textEditingValue.text.isEmpty)
-      return const Iterable<String>.empty();
-
-    return volunteerController.volunteers
-        .where((v) => v.name.toLowerCase().contains(textEditingValue.text.toLowerCase()))
-        .map((v) => v.name);
-  },
-  displayStringForOption: (option) => option,
-  fieldViewBuilder: (context, textEditingController, focusNode, onEditingComplete) {
-    return TextFormField(
-      controller: textEditingController,
-      focusNode: focusNode,
-      decoration: const InputDecoration(
-        labelText: "اكتب اسم المتطوع",
-        border: OutlineInputBorder(),
-      ),
-    );
-  },
-  onSelected: (String selection) {
-    final selectedVolunteer = volunteerController.volunteers.firstWhere((v) => v.name == selection);
-    volunteerController.selectedVolunteerId.value = selectedVolunteer.id;
-  },
-),
-                const SizedBox(height: 16),
-                Obx(
-                  () => CheckboxListTile(
-                    title: const Text("هل يحتاج تنسيق؟"),
-                    value: controller.needsCoordination.value,
-                    onChanged: (v) => controller.needsCoordination.value = v!,
-                  ),
-                ),
-                Obx(
-                  () => CheckboxListTile(
-                    title: const Text("هل يحتاج تصميم؟"),
-                    value: controller.needsDesign.value,
-                    onChanged: (v) => controller.needsDesign.value = v!,
-                  ),
-                ),
-                Obx(
-                  () => CheckboxListTile(
-                    title: const Text("تم النشر؟"),
-                    value: controller.isPublished.value,
-                    onChanged: (v) => controller.isPublished.value = v!,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Obx(
-                  () =>
-                      controller.isSubmitting.value
-                          ? const Center(child: CircularProgressIndicator())
-                          : ElevatedButton(
-                              onPressed: () async {
-                                final id =
-                                    volunteerController.selectedVolunteerId.value;
-                                if (id != null) {
-                                  await controller.submitPost(id);
-                                } else {
-                                  Get.snackbar("خطأ", "الرجاء اختيار المتطوع");
-                                }
-                              },
-                              child: Text(
-                                "إضافة البوست",
-                                style: TextStyle(
-                                  fontSize: isTablet ? widthScreen * 0.045 : widthScreen * 0.04,
-                                ),
-                              ),
-                            ),
-                ),
-              ],
-            ),
-          );
-        }),
       ),
     );
   }

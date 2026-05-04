@@ -1,30 +1,36 @@
+import 'package:MedLife/controller/getVolunteers/getVolunteersController.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:MedLife/controller/content_Writer/addPost/addPostService.dart';
 
+
 class AddPostController extends GetxController {
   final postIdeaController = TextEditingController();
+
   var needsCoordination = false.obs;
   var needsDesign = false.obs;
   var isPublished = false.obs;
   var isSubmitting = false.obs;
 
+  late Getvolunteerscontroller volunteerController;
 
-   @override
-  void onReady() {
-    super.onReady();
-    // إعادة تعيين القيم عند كل فتح للشاشة
-    postIdeaController.clear();
-    needsCoordination.value = false;
-    needsDesign.value = false;
-    isPublished.value = false;
+  @override
+  void onInit() {
+    super.onInit();
+    volunteerController = Get.find<Getvolunteerscontroller>();
   }
 
   Future<void> submitPost(int volunteerId) async {
+    final idea = postIdeaController.text.trim();
+
+    if (idea.isEmpty) {
+      Get.snackbar("تنبيه", "اكتب فكرة البوست");
+      return;
+    }
+
     isSubmitting.value = true;
+
     try {
-      final idea = postIdeaController.text;
-      // ignore: unused_local_variable
       final response = await AddPostService().addPost(
         idea,
         volunteerId,
@@ -32,15 +38,29 @@ class AddPostController extends GetxController {
         needsDesign.value,
         isPublished.value,
       );
-      Get.snackbar("تم", "تمت إضافة البوست بنجاح");
-      postIdeaController.clear();
-      needsCoordination.value = false;
-      needsDesign.value = false;
-      isPublished.value = false;
+
+      if (response != null) {
+        Get.snackbar("تم", "تمت إضافة البوست بنجاح");
+
+        /// reset state
+        postIdeaController.clear();
+        needsCoordination.value = false;
+        needsDesign.value = false;
+        isPublished.value = false;
+        volunteerController.selectedVolunteerId.value = null;
+      } else {
+        Get.snackbar("خطأ", "فشل إضافة البوست");
+      }
     } catch (e) {
-      Get.snackbar("خطأ", e.toString());
+      Get.snackbar("خطأ", "حدث خطأ أثناء الإرسال");
     } finally {
       isSubmitting.value = false;
     }
+  }
+
+  @override
+  void onClose() {
+    postIdeaController.dispose();
+    super.onClose();
   }
 }
