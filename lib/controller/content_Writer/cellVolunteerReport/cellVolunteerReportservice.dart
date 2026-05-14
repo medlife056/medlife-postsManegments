@@ -6,24 +6,40 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class CellVolunteersReportService {
   Future<List<CellVolunteerReportModel>> fetchVolunteersReport() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('access_token');
-    int? cellId = prefs.getInt('cellId');
-print(cellId);
-    final response = await ErrorHandler.safeApiCall(() {
-      return http.get(
-        Uri.parse('${AppLink.cellVolunteersReport}=$cellId'),
-        headers: {'Authorization': 'Bearer $token'},
-      );
-    });
-    print(response['data']);
-    if (response == null) return [];
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    if (response['data'] != null && response['data'] is List) {
-      final List data = response['data'];
-      return data.map((e) => CellVolunteerReportModel.fromJson(e)).toList();
+      String? token = prefs.getString('access_token');
+
+      int? cellId = prefs.getInt('cellId');
+
+      final response = await ErrorHandler.safeApiCall(() {
+        return http.get(
+          Uri.parse('${AppLink.cellVolunteersReport}=$cellId'),
+          headers: {'Authorization': 'Bearer $token'},
+        );
+      });
+
+      if (response == null) return [];
+
+      final body = response['body'];
+
+      if (body == null) return [];
+
+      final data = body['data'];
+
+      if (data == null || data is! List) {
+        return [];
+      }
+
+      return data
+          .map<CellVolunteerReportModel>(
+            (e) => CellVolunteerReportModel.fromJson(e),
+          )
+          .toList();
+    } catch (e) {
+      print("VOLUNTEERS REPORT ERROR => $e");
+      return [];
     }
-
-    return [];
   }
 }

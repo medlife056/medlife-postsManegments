@@ -6,27 +6,26 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class CoordinaterService {
   Future<List<CellModel>> fetchCells() async {
-
-SharedPreferences prefs = await SharedPreferences.getInstance();
-   String? token = prefs.getString('access_token');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('access_token');
 
     final response = await ErrorHandler.safeApiCall(() {
       return http.get(
         Uri.parse(AppLink.showCells),
-        headers: {
-          'Authorization':
-              'Bearer $token',
-        },
+        headers: {'Authorization': 'Bearer $token'},
       );
     });
 
     if (response == null) return [];
 
-    if (response['data'] != null) {
-      final List data = response['data'];
-      return data.map((e) => CellModel.fromJson(e)).toList();
-    }
+    final body = response['body']; // ✅ access body first
+    if (body == null) return [];
 
-    return [];
+    final data = body['data'];
+    if (data == null || data is! List) return [];
+
+    return (data as List)
+        .map((e) => CellModel.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 }

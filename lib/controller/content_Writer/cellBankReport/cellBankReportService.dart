@@ -6,23 +6,31 @@ import 'package:MedLife/errors/errorsHandler.dart';
 
 class CellBankService {
   Future<CellBankStats?> fetchCellBankStats() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('access_token');
-    int? cellId = prefs.getInt('cellId');
-    print(cellId);
-    final url = Uri.parse('${AppLink.cellBankReport}=$cellId');
-
-    final response = await ErrorHandler.safeApiCall(() {
-      return http.get(url, headers: {'Authorization': 'Bearer $token'});
-    });
-
-    if (response == null) return null;
-
     try {
-      final data = response['data'];
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      String? token = prefs.getString('access_token');
+      int? cellId = prefs.getInt('cellId');
+
+      final url = Uri.parse('${AppLink.cellBankReport}=$cellId');
+
+      final response = await ErrorHandler.safeApiCall(() {
+        return http.get(url, headers: {'Authorization': 'Bearer $token'});
+      });
+
+      if (response == null) return null;
+
+      final body = response['body'];
+
+      if (body == null) return null;
+
+      final data = body['data'];
+
+      if (data == null) return null;
+
       return CellBankStats.fromJson(data);
     } catch (e) {
-      // معالجة في حال فشل التحويل من JSON
+      print("CELL BANK ERROR => $e");
       return null;
     }
   }

@@ -10,6 +10,9 @@ class CellPostsStatsController extends GetxController {
   var stats = <CellPostsStatsModel>[].obs;
   var isLoading = true.obs;
 
+  /// بدل snackbar
+  var errorMessage = RxnString();
+
   @override
   void onInit() {
     fetchStats();
@@ -18,16 +21,21 @@ class CellPostsStatsController extends GetxController {
 
   @override
   void onClose() {
-    stats.clear(); 
+    stats.clear();
     super.onClose();
   }
 
-  void fetchStats() async {
+  Future<void> fetchStats() async {
     try {
       isLoading.value = true;
-      stats.value = await provider.fetchCellPostsStats();
+
+      final result = await provider.fetchCellPostsStats();
+
+      stats.value = result;
+
+      errorMessage.value = null;
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+      errorMessage.value = e.toString();
     } finally {
       isLoading.value = false;
     }

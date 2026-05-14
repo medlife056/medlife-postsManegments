@@ -24,8 +24,11 @@ class UndesignerCounterScreen extends StatelessWidget {
           backgroundColor: Colors.white,
           title: Row(
             children: [
-              Image.asset('assets/images/midlife logo.png', height: widthScreen * 0.1),
-              SizedBox(width: 10),
+              Image.asset(
+                'assets/images/midlife logo.png',
+                height: widthScreen * 0.1,
+              ),
+              const SizedBox(width: 10),
               Text(
                 "عدد المنشورات غير المصممة",
                 style: TextStyle(
@@ -41,22 +44,49 @@ class UndesignerCounterScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
 
+          // ✅ error state with retry button
+          if (controller.errorMessage.value.isNotEmpty &&
+              controller.stats.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                  const SizedBox(height: 12),
+                  Text(
+                    controller.errorMessage.value,
+                    style: const TextStyle(color: Colors.red, fontSize: 16),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    onPressed: () => controller.loadStats(),
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('إعادة المحاولة'),
+                  ),
+                ],
+              ),
+            );
+          }
+
           if (controller.stats.isEmpty) {
-            return Center(child: Text("لا توجد بيانات حالياً"));
+            return const Center(child: Text('لا توجد بيانات حالياً'));
           }
 
           return ListView.builder(
-            padding: EdgeInsets.symmetric(horizontal: widthScreen * 0.04, vertical: heightScreen * 0.02),
+            padding: EdgeInsets.symmetric(
+              horizontal: widthScreen * 0.04,
+              vertical: heightScreen * 0.02,
+            ),
             itemCount: controller.stats.length,
             itemBuilder: (context, index) {
               final item = controller.stats[index];
+
               return GestureDetector(
-                onTap: () {
-                  // يمكنك إضافة أكشن هنا إذا كان هناك حاجة
-                },
+                onTap: () {},
                 child: AnimatedScale(
                   scale: 1.0,
-                  duration: Duration(milliseconds: 200),
+                  duration: const Duration(milliseconds: 200),
                   child: Card(
                     margin: const EdgeInsets.symmetric(vertical: 8),
                     shape: RoundedRectangleBorder(
@@ -64,8 +94,15 @@ class UndesignerCounterScreen extends StatelessWidget {
                     ),
                     elevation: 5,
                     child: ListTile(
-                      contentPadding: EdgeInsets.symmetric(horizontal: widthScreen * 0.04, vertical: 12),
-                      leading: const Icon(Icons.groups, color: Colors.purple, size: 40),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: widthScreen * 0.04,
+                        vertical: 12,
+                      ),
+                      leading: const Icon(
+                        Icons.groups,
+                        color: Colors.purple,
+                        size: 40,
+                      ),
                       title: Text(
                         item.cellName,
                         style: TextStyle(

@@ -10,6 +10,9 @@ class CellUnPuplishedPostsController extends GetxController {
   var stats = <CellUnPuplishedPostsModel>[].obs;
   var isLoading = true.obs;
 
+  /// للـ UI
+  var errorMessage = RxnString();
+
   @override
   void onInit() {
     fetchStats();
@@ -17,17 +20,23 @@ class CellUnPuplishedPostsController extends GetxController {
   }
 
   @override
-void onClose() {
-  stats.clear(); // تفريغ البيانات عند الخروج من الشاشة
-  super.onClose();
-}
+  void onClose() {
+    stats.clear();
+    super.onClose();
+  }
 
-  void fetchStats() async {
+  Future<void> fetchStats() async {
     try {
       isLoading.value = true;
-      stats.value = await provider.fetchCellUnPuplishedPosts();
+
+      final result =
+          await provider.fetchCellUnPuplishedPosts();
+
+      stats.value = result;
+
+      errorMessage.value = null;
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+      errorMessage.value = e.toString();
     } finally {
       isLoading.value = false;
     }

@@ -19,7 +19,9 @@ class _DesignerEditPostScreenState extends State<DesignerEditPostScreen> {
   final Getvolunteerscontroller _getvolunteerscontroller = Get.put(
     Getvolunteerscontroller(),
   );
-  final DesignerPostEditController _updateController = Get.put(DesignerPostEditController());
+  final DesignerPostEditController _updateController = Get.put(
+    DesignerPostEditController(),
+  );
 
   bool isDesigned = false;
   String? designedBy;
@@ -28,18 +30,18 @@ class _DesignerEditPostScreenState extends State<DesignerEditPostScreen> {
   @override
   void initState() {
     super.initState();
-    designedBy = "designer_1"; // تغيير حسب المستخدم الحالي
+    designedBy = "designer_1";
     designedAt = DateTime.now();
   }
 
-  void submit() {
+  void submit(BuildContext context) {
     final updateModel = PostUpdateModel(
       id: widget.postId,
       isDesigned: isDesigned ? 1 : 0,
       designedBy: isDesigned ? designedBy : null,
       designedAt: isDesigned ? designedAt : null,
     );
-    _updateController.updatePost(updateModel);
+    _updateController.updatePost(updateModel, context); // ✅ pass context
   }
 
   @override
@@ -59,7 +61,7 @@ class _DesignerEditPostScreenState extends State<DesignerEditPostScreen> {
                 'assets/images/midlife logo.png',
                 height: widthScreen * 0.1,
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Text(
                 "تعديل التصميم",
                 style: TextStyle(
@@ -93,6 +95,35 @@ class _DesignerEditPostScreenState extends State<DesignerEditPostScreen> {
                     });
                   },
                 ),
+
+                // ✅ error shown in UI via Obx, no ever() needed
+                if (_updateController.errorMessage.value.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          color: Colors.red,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _updateController.errorMessage.value,
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
                 if (isDesigned) ...[
                   SizedBox(height: heightScreen * 0.02),
                   DropdownButtonFormField<int>(
@@ -104,7 +135,7 @@ class _DesignerEditPostScreenState extends State<DesignerEditPostScreen> {
                             child: Text(volunteer.name),
                           );
                         }).toList(),
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: "اختر المصمم",
                       border: OutlineInputBorder(),
                     ),
@@ -119,16 +150,21 @@ class _DesignerEditPostScreenState extends State<DesignerEditPostScreen> {
                     style: TextStyle(fontSize: widthScreen * 0.04),
                   ),
                 ],
-                Spacer(),
+
+                const Spacer(),
+
                 ElevatedButton(
-                  onPressed: submit,
+                  onPressed: () => submit(context), // ✅ pass context
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     minimumSize: Size.fromHeight(heightScreen * 0.07),
                   ),
                   child: Text(
                     "تحديث",
-                    style: TextStyle(fontSize: widthScreen * 0.045),
+                    style: TextStyle(
+                      fontSize: widthScreen * 0.045,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ],

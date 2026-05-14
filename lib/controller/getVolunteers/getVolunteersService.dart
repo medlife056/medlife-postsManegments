@@ -21,7 +21,7 @@ class Getvolunteersservice {
     if (response == null) return [];
 
     try {
-      final List data = response['data']['data'];
+      final List data = response['body']['data'];
       return data.map((v) => Volunteer.fromJson(v)).toList();
     } catch (e) {
       return [];

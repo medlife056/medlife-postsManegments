@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class UndesignedPostService {
   Future<List<PostModel>> fetchUndesignedPosts(int cellId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-   String? token = prefs.getString('access_token');
+    String? token = prefs.getString('access_token');
 
     final response = await ErrorHandler.safeApiCall(() {
       return http.get(
@@ -15,12 +15,17 @@ class UndesignedPostService {
         headers: {'Authorization': 'Bearer $token'},
       );
     });
-    print(response['data']);
+
     if (response == null) return [];
 
-    if (response['data'] != null) {
-      final List data = response['data'];
-      return data.map((e) => PostModel.fromJson(e)).toList();
+    final body = response['body'];
+    if (body == null) return [];
+
+    final data = body['data'];
+    if (data != null && data is List) {
+      return (data as List)
+          .map((e) => PostModel.fromJson(e as Map<String, dynamic>))
+          .toList();
     }
 
     return [];

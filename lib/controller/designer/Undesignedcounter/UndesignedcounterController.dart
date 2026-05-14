@@ -9,28 +9,35 @@ class UndesignedcounterController extends GetxController {
 
   var stats = <UndesignedcounterModel>[].obs;
   var isLoading = true.obs;
+  var errorMessage = ''.obs; // ✅ added for UI error display
 
   @override
-  void onInit() {
-    super.onInit();
-    loadStats();
-  }
-
-    @override
   void onReady() {
     super.onReady();
-    loadStats(); // كل مرة ترجع للواجهة رح تنعاد
+    loadStats(); // ✅ only onReady, removed onInit to avoid double fetch
   }
 
   @override
   void onClose() {
+    stats.clear();
     super.onClose();
-    stats.clear(); 
   }
 
-  void loadStats() async {
+  Future<void> loadStats() async {
     isLoading.value = true;
-    stats.value = await provider.fetchUndesignedPosts();
-    isLoading.value = false;
+    errorMessage.value = '';
+
+    try {
+      final data = await provider.fetchUndesignedPosts();
+      stats.value = data;
+
+      if (data.isEmpty) {
+        errorMessage.value = 'لا توجد بيانات حالياً';
+      }
+    } catch (e) {
+      errorMessage.value = 'فشل في جلب البيانات';
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

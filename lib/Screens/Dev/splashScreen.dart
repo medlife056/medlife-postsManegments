@@ -22,27 +22,39 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Timer(const Duration(seconds: 3), () async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
+
       String? token = prefs.getString('access_token');
       String? role = prefs.getString('role');
 
-      if (token != null) {
-        if (role == 'admin') {
-          Get.offAll(() => AdminHomeScreen());
-        }
-        if (role == 'design') {
-          Get.offAll(() => DesignerHomeScreen());
-        }
-        if (role == 'coordinate') {
-          Get.offAll(() => CoordinaterHomeScreen());
-        }
-        if (role == 'content_writer') {
-          Get.offAll(() => ContentWriterHomeScreen());
-        }
-      } else {
+      print("TOKEN => $token");
+
+      if (token == null || token.isEmpty) {
         Get.offAll(() => LoginScreen());
+        return;
       }
-      ;
+
+      switch (role) {
+        case 'admin':
+          Get.offAll(() => AdminHomeScreen());
+          break;
+
+        case 'design':
+          Get.offAll(() => DesignerHomeScreen());
+          break;
+
+        case 'coordinate':
+          Get.offAll(() => CoordinaterHomeScreen());
+          break;
+
+        case 'content_writer':
+          Get.offAll(() => ContentWriterHomeScreen());
+          break;
+
+        default:
+          Get.offAll(() => LoginScreen());
+      }
     });
+    ;
   }
 
   @override

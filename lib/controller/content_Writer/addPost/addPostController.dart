@@ -3,35 +3,44 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:MedLife/controller/content_Writer/addPost/addPostService.dart';
 
-
 class AddPostController extends GetxController {
   final postIdeaController = TextEditingController();
 
   var needsCoordination = false.obs;
+
   var needsDesign = false.obs;
+
   var isPublished = false.obs;
+
   var isSubmitting = false.obs;
+
+  /// UI Messages
+  var successMessage = RxnString();
+
+  var errorMessage = RxnString();
 
   late Getvolunteerscontroller volunteerController;
 
   @override
   void onInit() {
     super.onInit();
+
     volunteerController = Get.find<Getvolunteerscontroller>();
   }
 
-  Future<void> submitPost(int volunteerId) async {
+  Future<bool> submitPost(int volunteerId) async {
     final idea = postIdeaController.text.trim();
 
     if (idea.isEmpty) {
-      Get.snackbar("تنبيه", "اكتب فكرة البوست");
-      return;
+      errorMessage.value = "اكتب فكرة البوست";
+
+      return false;
     }
 
     isSubmitting.value = true;
 
     try {
-      final response = await AddPostService().addPost(
+      final success = await AddPostService().addPost(
         idea,
         volunteerId,
         needsCoordination.value,
@@ -39,20 +48,30 @@ class AddPostController extends GetxController {
         isPublished.value,
       );
 
-      if (response != null) {
-        Get.snackbar("تم", "تمت إضافة البوست بنجاح");
+      if (success) {
+        successMessage.value = "تمت إضافة البوست بنجاح";
 
-        /// reset state
+        /// reset
         postIdeaController.clear();
+
         needsCoordination.value = false;
+
         needsDesign.value = false;
+
         isPublished.value = false;
+
         volunteerController.selectedVolunteerId.value = null;
-      } else {
-        Get.snackbar("خطأ", "فشل إضافة البوست");
+
+        return true;
       }
+
+      errorMessage.value = "فشل إضافة البوست";
+
+      return false;
     } catch (e) {
-      Get.snackbar("خطأ", "حدث خطأ أثناء الإرسال");
+      errorMessage.value = "حدث خطأ أثناء الإرسال";
+
+      return false;
     } finally {
       isSubmitting.value = false;
     }
@@ -61,6 +80,7 @@ class AddPostController extends GetxController {
   @override
   void onClose() {
     postIdeaController.dispose();
+
     super.onClose();
   }
 }

@@ -5,11 +5,23 @@ import 'package:MedLife/models/postModel.dart';
 class UndesignedPostController extends GetxController {
   final posts = <PostModel>[].obs;
   final isLoading = false.obs;
+  var errorMessage = ''.obs; // ✅ added for UI error display
 
   Future<void> loadPosts(int cellId) async {
     isLoading.value = true;
-    final data = await UndesignedPostService().fetchUndesignedPosts(cellId);
-    posts.assignAll(data);
-    isLoading.value = false;
+    errorMessage.value = '';
+
+    try {
+      final data = await UndesignedPostService().fetchUndesignedPosts(cellId);
+      posts.assignAll(data);
+
+      if (data.isEmpty) {
+        errorMessage.value = 'لا يوجد منشورات غير مصممة';
+      }
+    } catch (e) {
+      errorMessage.value = 'فشل في جلب البيانات';
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

@@ -9,27 +9,38 @@ class CellBankController extends GetxController {
   var isLoading = false.obs;
   var errorMessage = ''.obs;
 
+  @override
   void onInit() {
     super.onInit();
-    loadStats();
   }
 
-  // @override
-  // void onReady() {
-  //   super.onReady();
-  //   loadStats();
-  // }
+  @override
+  void onReady() {
+    super.onReady();
+    loadStats(); // ✅ moved from onInit to onReady
+  }
 
   Future<void> loadStats() async {
-    final start = DateTime.now(); // ⏱️ بداية القياس
+    final start = DateTime.now();
+
     isLoading.value = true;
+    errorMessage.value = '';
+
     try {
-      stats.value = await _service.fetchCellBankStats();
+      final result = await _service.fetchCellBankStats();
+
+      if (result != null) {
+        stats.value = result;
+      } else {
+        errorMessage.value = 'لا توجد بيانات';
+      }
     } catch (e) {
       errorMessage.value = 'فشل في تحميل تقرير بنك الخلية';
     } finally {
       isLoading.value = false;
-      final end = DateTime.now(); // ⏱️ نهاية القياس
+
+      final end = DateTime.now();
+
       print(
         "📊 زمن تحميل تقرير بنك الخلية: ${end.difference(start).inMilliseconds} ms",
       );

@@ -29,13 +29,16 @@ class PostDesignerService {
 
     if (response == null) return false;
 
-    try {
-      if (response['message'] == 'Post updated successfully.') {
-        return true;
-      }
-      return false;
-    } catch (e) {
-      return false;
-    }
+    final statusCode = response['statusCode'];
+    final body = response['body'];
+
+    if (body == null) return false;
+
+    if (statusCode == 200 || statusCode == 201) return true;
+
+    final message = body['message']?.toString().toLowerCase() ?? '';
+    if (message.contains('success') || message.contains('updated')) return true;
+
+    return false;
   }
 }

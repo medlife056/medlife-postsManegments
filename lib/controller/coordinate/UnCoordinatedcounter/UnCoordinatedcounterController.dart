@@ -9,28 +9,35 @@ class UnCoordinatercounterController extends GetxController {
 
   var stats = <UnCoordinatedcounterModel>[].obs;
   var isLoading = true.obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-    loadStats();
-  }
+  var errorMessage = ''.obs; // ✅ added for UI error display
 
   @override
   void onReady() {
     super.onReady();
-    loadStats(); // كل مرة ترجع للواجهة رح تنعاد
+    loadStats(); // ✅ only onReady, removed onInit to avoid double fetch
   }
 
   @override
   void onClose() {
-    super.onClose();
     stats.clear();
+    super.onClose();
   }
 
-  void loadStats() async {
+  Future<void> loadStats() async {
     isLoading.value = true;
-    stats.value = await provider.fetchUncoordinatePosts();
-    isLoading.value = false;
+    errorMessage.value = '';
+
+    try {
+      final data = await provider.fetchUncoordinatePosts();
+      stats.value = data;
+
+      if (data.isEmpty) {
+        errorMessage.value = 'لا توجد بيانات حالياً';
+      }
+    } catch (e) {
+      errorMessage.value = 'فشل في جلب البيانات';
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

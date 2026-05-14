@@ -4,67 +4,99 @@ import 'package:MedLife/constant/Apis.dart';
 import 'package:MedLife/errors/errorsHandler.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-//import 'package:shared_preferences/shared_preferences.dart';
 
 class CreateWriterController extends GetxController {
   final nameController = TextEditingController();
+
   final passwordController = TextEditingController();
+
   final confirmPasswordController = TextEditingController();
 
   var isLoading = false.obs;
+
   var obscurePassword = true.obs;
+
+  /// للـ UI
+  var successMessage = RxnString();
+
+  var errorMessage = RxnString();
 
   void togglePasswordVisibility() {
     obscurePassword.value = !obscurePassword.value;
   }
 
-  void register() async {
+  Future<bool> register() async {
     if (passwordController.text != confirmPasswordController.text) {
-      Get.snackbar("خطأ", "كلمتا المرور غير متطابقتين");
-      return;
+      errorMessage.value = "كلمتا المرور غير متطابقتين";
+
+      return false;
     }
 
-    isLoading.value = true;
+    try {
+      isLoading.value = true;
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('access_token');
+      SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    final response = await ErrorHandler.safeApiCall(() {
-      return http.post(
-        Uri.parse(AppLink.createWriter),
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: {
-          'name': nameController.text,
-          'password': passwordController.text,
-          'password_confirmation': confirmPasswordController.text,
-        },
-      );
-    });
+      String? token = prefs.getString('access_token');
 
-    isLoading.value = false;
+      final response = await ErrorHandler.safeApiCall(() {
+        return http.post(
+          Uri.parse(AppLink.createWriter),
 
-    if (response != null) {
-      // في حال كانت الاستجابة ناجحة ومفكوكة
-      if (response['message'] != null) {
-        Get.snackbar("تم التسجيل", response['message']);
-      } else if (response['errors'] != null) {
-        // الأخطاء الخاصة بالـ Laravel Validation
-        String errorMessage = '';
-        response['errors'].forEach((key, value) {
-          errorMessage += "$key: ${value[0]}\n";
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+
+          body: {
+            'name': nameController.text,
+
+            'password': passwordController.text,
+
+            'password_confirmation': confirmPasswordController.text,
+          },
+        );
+      });
+
+      print("CREATE WRITER => $response");
+
+      if (response == null) {
+        errorMessage.value = "فشل الاتصال بالسيرفر";
+
+        return false;
+      }
+
+      final body = response['body'];
+
+      /// نجاح
+      if (body['message'] != null) {
+        successMessage.value = body['message'];
+
+        return true;
+      }
+
+      /// Validation Errors
+      if (body['errors'] != null) {
+        String errorText = '';
+
+        body['errors'].forEach((key, value) {
+          errorText += "$key : ${value[0]}\n";
         });
 
-        Get.snackbar("خطأ في التحقق", errorMessage.trim());
-      } else {
-        // أي رسالة أخرى
-        Get.snackbar("ملاحظة", "لم يتم استقبال رسالة واضحة من الخادم");
+        errorMessage.value = errorText.trim();
+
+        return false;
       }
-    } else {
-      // تمت معالجته بالفعل داخل ErrorHandler
-      print("فشل الاتصال أو حصل استثناء أثناء التسجيل");
+
+      errorMessage.value = "حدث خطأ غير متوقع";
+
+      return false;
+    } catch (e) {
+      errorMessage.value = e.toString();
+
+      return false;
+    } finally {
+      isLoading.value = false;
     }
   }
 }

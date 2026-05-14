@@ -29,18 +29,18 @@ class _CoordinateEditPostScreenState extends State<CoordinateEditPostScreen> {
   @override
   void initState() {
     super.initState();
-    coordinatedBy = "coordinaterBy_1"; // Modify as per the current user
+    coordinatedBy = "coordinaterBy_1";
     coordinatedAt = DateTime.now();
   }
 
-  void submit() {
+  void submit(BuildContext context) {
     final updateModel = PostUpdateModel(
       id: widget.postId,
       isCoordinated: isCoordinated ? 1 : 0,
       coordinatedBy: isCoordinated ? coordinatedBy : null,
       coordinatedAt: isCoordinated ? coordinatedAt : null,
     );
-    _updateController.updatePost(updateModel);
+    _updateController.updatePost(updateModel, context);
   }
 
   @override
@@ -61,7 +61,7 @@ class _CoordinateEditPostScreenState extends State<CoordinateEditPostScreen> {
                 'assets/images/midlife logo.png',
                 height: isTablet ? heightScreen * 0.08 : heightScreen * 0.05,
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Text(
                 "تعديل التنسيق",
                 style: TextStyle(
@@ -100,6 +100,35 @@ class _CoordinateEditPostScreenState extends State<CoordinateEditPostScreen> {
                     });
                   },
                 ),
+
+                // ✅ error shown in UI via Obx, no ever() needed
+                if (_updateController.errorMessage.value.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          color: Colors.red,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _updateController.errorMessage.value,
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
                 if (isCoordinated) ...[
                   SizedBox(height: isTablet ? heightScreen * 0.04 : 16),
                   DropdownButtonFormField<int>(
@@ -113,7 +142,7 @@ class _CoordinateEditPostScreenState extends State<CoordinateEditPostScreen> {
                         }).toList(),
                     decoration: InputDecoration(
                       labelText: "اختر المنسق",
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
                       contentPadding: EdgeInsets.symmetric(
                         vertical: isTablet ? heightScreen * 0.02 : 8,
                         horizontal: 12,
@@ -133,9 +162,11 @@ class _CoordinateEditPostScreenState extends State<CoordinateEditPostScreen> {
                     ),
                   ),
                 ],
-                Spacer(),
+
+                const Spacer(),
+
                 ElevatedButton(
-                  onPressed: submit,
+                  onPressed: () => submit(context), // ✅ pass context
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     minimumSize: Size.fromHeight(
@@ -147,6 +178,7 @@ class _CoordinateEditPostScreenState extends State<CoordinateEditPostScreen> {
                     style: TextStyle(
                       fontSize:
                           isTablet ? widthScreen * 0.06 : widthScreen * 0.05,
+                      color: Colors.white,
                     ),
                   ),
                 ),

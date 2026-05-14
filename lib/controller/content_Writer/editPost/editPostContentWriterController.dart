@@ -6,19 +6,22 @@ class PostContentWriterEditController extends GetxController {
   final PostContentWriterService _postService = PostContentWriterService();
 
   var isLoading = false.obs;
-  var errorMessage = ''.obs;
 
-  Future<void> updatePost(PostUpdateModel updateModel) async {
+  Future<String?> updatePost(PostUpdateModel updateModel) async {
     try {
       isLoading.value = true;
-      errorMessage.value = '';
 
-      await _postService.updatePostContentWriterFields(updateModel);
+      final success = await _postService.updatePostContentWriterFields(
+        updateModel,
+      );
 
-      Get.snackbar("تم التعديل", "تم تعديل البوست بنجاح");
+      if (success) {
+        return "تم تعديل البوست بنجاح";
+      }
+
+      return "فشل في تعديل البوست";
     } catch (e) {
-      errorMessage.value = "فشل في تعديل البوست";
-      Get.snackbar("خطأ", errorMessage.value);
+      return "حدث خطأ أثناء التعديل";
     } finally {
       isLoading.value = false;
     }

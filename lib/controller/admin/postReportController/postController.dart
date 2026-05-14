@@ -3,8 +3,12 @@ import 'package:MedLife/controller/admin/postReportController/postService.dart';
 import 'package:MedLife/models/postModel.dart';
 
 class PostController extends GetxController {
+
   var isLoading = true.obs;
+
   var postList = <PostModel>[].obs;
+
+  var errorMessage = RxnString();
 
   final PostProvider _postProvider = PostProvider();
 
@@ -17,21 +21,34 @@ class PostController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    fetchPosts(); // كل مرة ترجع للواجهة رح تنعاد
+    fetchPosts();
   }
 
   @override
   void onClose() {
+    postList.clear();
     super.onClose();
-    postList.clear(); 
   }
 
-  void fetchPosts() async {
+  Future<void> fetchPosts() async {
+
     try {
+
       isLoading(true);
-      var posts = await _postProvider.fetchPosts();
+
+      final posts =
+          await _postProvider.fetchPosts();
+
       postList.assignAll(posts);
+
+      errorMessage.value = null;
+
+    } catch (e) {
+
+      errorMessage.value = e.toString();
+
     } finally {
+
       isLoading(false);
     }
   }

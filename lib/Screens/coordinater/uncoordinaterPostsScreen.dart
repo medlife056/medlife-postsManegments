@@ -6,14 +6,18 @@ import 'package:MedLife/controller/coordinate/UnCoordinatedPost/UnCoordinatedPos
 
 class UncoordinatePostsScreen extends StatelessWidget {
   final int cellId;
-  final controller = Get.put(UncoordinatePostController());
 
-  UncoordinatePostsScreen({required this.cellId}) {
-    controller.loadPosts(cellId);
-  }
+  const UncoordinatePostsScreen({super.key, required this.cellId});
 
   @override
   Widget build(BuildContext context) {
+    // ✅ put controller inside build, load posts after widget tree is ready
+    final controller = Get.put(UncoordinatePostController());
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.loadPosts(cellId);
+    });
+
     final widthScreen = MediaQuery.of(context).size.width;
     final heightScreen = MediaQuery.of(context).size.height;
     final isTablet = widthScreen > 600;
@@ -22,7 +26,6 @@ class UncoordinatePostsScreen extends StatelessWidget {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: Colors.white,
-
         appBar: AppBar(
           backgroundColor: Colors.white,
           title: Row(
@@ -31,7 +34,7 @@ class UncoordinatePostsScreen extends StatelessWidget {
                 'assets/images/midlife logo.png',
                 height: isTablet ? heightScreen * 0.08 : heightScreen * 0.05,
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Text(
                 "المنشورات الغير منسقة لكل خلية",
                 style: TextStyle(
@@ -44,18 +47,45 @@ class UncoordinatePostsScreen extends StatelessWidget {
         ),
         body: Obx(() {
           if (controller.isLoading.value) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
+
+          // ✅ error state with retry button
+          if (controller.errorMessage.value.isNotEmpty &&
+              controller.posts.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                  const SizedBox(height: 12),
+                  Text(
+                    controller.errorMessage.value,
+                    style: const TextStyle(color: Colors.red, fontSize: 16),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    onPressed: () => controller.loadPosts(cellId),
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('إعادة المحاولة'),
+                  ),
+                ],
+              ),
+            );
+          }
+
           if (controller.posts.isEmpty) {
             return Center(
               child: Text(
-                "لا يوجد منشورات غير منسقة",
+                'لا يوجد منشورات غير منسقة',
                 style: TextStyle(
                   fontSize: isTablet ? widthScreen * 0.06 : widthScreen * 0.05,
                 ),
               ),
             );
           }
+
           return ListView.builder(
             padding: EdgeInsets.symmetric(
               horizontal: isTablet ? widthScreen * 0.05 : 16,
@@ -64,6 +94,7 @@ class UncoordinatePostsScreen extends StatelessWidget {
             itemCount: controller.posts.length,
             itemBuilder: (context, index) {
               final post = controller.posts[index];
+
               return Card(
                 margin: EdgeInsets.symmetric(
                   horizontal: isTablet ? widthScreen * 0.05 : 16,

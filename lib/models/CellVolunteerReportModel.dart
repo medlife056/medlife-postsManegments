@@ -17,12 +17,12 @@ class CellVolunteerReportModel {
 
   factory CellVolunteerReportModel.fromJson(Map<String, dynamic> json) {
     return CellVolunteerReportModel(
-      id: json['id'],
-      name: json['name'],
-      status: json['status'],
-      cell: json['cell'],
-      position: json['position'],
-      publishedPosts: json['published_posts'],
+      id: json['id'] ?? 0,
+      name: json['full_name'] ?? '',
+      status: json['academic_status'] ?? '',
+      cell: json['governorate'] ?? '', // closest match in response
+      position: json['specialization'] ?? '',
+      publishedPosts: json['tasks_count'] ?? 0,
     );
   }
 }

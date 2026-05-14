@@ -5,10 +5,12 @@ import 'package:MedLife/constant/appColors.dart';
 import 'package:MedLife/controller/designer/showcellcontroller/cellController.dart';
 
 class DesignerCellsScreen extends StatelessWidget {
-  final controller = Get.put(DesignerCellsController());
+  const DesignerCellsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(DesignerCellsController()); // ✅ inside build
+
     final widthScreen = MediaQuery.of(context).size.width;
     final heightScreen = MediaQuery.of(context).size.height;
     final isTablet = widthScreen > 600;
@@ -17,7 +19,6 @@ class DesignerCellsScreen extends StatelessWidget {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: Colors.white,
-
         appBar: AppBar(
           backgroundColor: Colors.white,
           title: Row(
@@ -26,7 +27,7 @@ class DesignerCellsScreen extends StatelessWidget {
                 'assets/images/midlife logo.png',
                 height: isTablet ? heightScreen * 0.08 : heightScreen * 0.05,
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Text(
                 "الخلايا",
                 style: TextStyle(
@@ -39,7 +40,36 @@ class DesignerCellsScreen extends StatelessWidget {
         ),
         body: Obx(() {
           if (controller.isLoading.value) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          // ✅ error state with retry button
+          if (controller.errorMessage.value.isNotEmpty &&
+              controller.cells.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                  const SizedBox(height: 12),
+                  Text(
+                    controller.errorMessage.value,
+                    style: const TextStyle(color: Colors.red, fontSize: 16),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    onPressed: () => controller.loadCells(),
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('إعادة المحاولة'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          if (controller.cells.isEmpty) {
+            return const Center(child: Text('لا توجد خلايا حالياً'));
           }
 
           return ListView.separated(
@@ -50,6 +80,7 @@ class DesignerCellsScreen extends StatelessWidget {
                     SizedBox(height: isTablet ? heightScreen * 0.02 : 10),
             itemBuilder: (context, index) {
               final cell = controller.cells[index];
+
               return InkWell(
                 onTap: () {
                   Get.to(() => UndesignedPostsScreen(cellId: cell.id));

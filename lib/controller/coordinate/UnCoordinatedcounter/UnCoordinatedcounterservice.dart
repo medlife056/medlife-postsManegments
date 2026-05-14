@@ -18,13 +18,26 @@ class UncoordinatecounterProvider {
 
     if (response == null) return [];
 
-    if (response is List) {
-      return response
-          .map((e) => UnCoordinatedcounterModel.fromJson(e))
+    final body = response['body'];
+    if (body == null) return [];
+
+    if (body is List) {
+      return (body as List)
+          .map(
+            (e) =>
+                UnCoordinatedcounterModel.fromJson(e as Map<String, dynamic>),
+          )
           .toList();
-    } else if (response['data'] != null) {
-      final List stats = response['data'];
-      return stats.map((e) => UnCoordinatedcounterModel.fromJson(e)).toList();
+    }
+
+    final data = body['data'];
+    if (data != null && data is List) {
+      return (data as List)
+          .map(
+            (e) =>
+                UnCoordinatedcounterModel.fromJson(e as Map<String, dynamic>),
+          )
+          .toList();
     }
 
     return [];

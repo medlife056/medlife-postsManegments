@@ -5,35 +5,37 @@ import 'package:MedLife/models/cellModel.dart';
 class CoordinaterCellsController extends GetxController {
   var cells = <CellModel>[].obs;
   var isLoading = true.obs;
+  var errorMessage = ''.obs; // ✅ added for UI error display
 
   final CoordinaterService _service = CoordinaterService();
 
   @override
-  void onInit() {
-    super.onInit();
-    loadCells();
-  }
-
-  @override
   void onReady() {
     super.onReady();
-    loadCells(); // كل مرة ترجع للواجهة رح تنعاد
+    loadCells(); // ✅ only onReady, removed onInit to avoid double fetch
   }
 
   @override
   void onClose() {
-    super.onClose();
     cells.clear();
+    super.onClose();
   }
 
-  void loadCells() async {
+  Future<void> loadCells() async {
+    isLoading.value = true;
+    errorMessage.value = '';
+
     try {
-      isLoading(true);
-      cells.value = await _service.fetchCells();
+      final data = await _service.fetchCells();
+      cells.value = data;
+
+      if (data.isEmpty) {
+        errorMessage.value = 'لا توجد خلايا حالياً';
+      }
     } catch (e) {
-      Get.snackbar('خطأ', 'فشل في جلب البيانات');
+      errorMessage.value = 'فشل في جلب البيانات';
     } finally {
-      isLoading(false);
+      isLoading.value = false;
     }
   }
 }
