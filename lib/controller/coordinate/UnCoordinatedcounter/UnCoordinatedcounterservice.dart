@@ -22,6 +22,7 @@ class UncoordinatecounterProvider {
     if (body == null) return [];
 
     if (body is List) {
+      // ignore: unnecessary_cast
       return (body as List)
           .map(
             (e) =>
@@ -32,6 +33,7 @@ class UncoordinatecounterProvider {
 
     final data = body['data'];
     if (data != null && data is List) {
+      // ignore: unnecessary_cast
       return (data as List)
           .map(
             (e) =>

@@ -33,6 +33,7 @@ class AuthService {
       SharedPreferences prefs = await SharedPreferences.getInstance();
 
       await prefs.setString('access_token', token ?? '');
+      // ignore: dead_null_aware_expression
       await prefs.setInt('cellId', cellId ?? 0);
       await prefs.setString('role', role ?? '');
 

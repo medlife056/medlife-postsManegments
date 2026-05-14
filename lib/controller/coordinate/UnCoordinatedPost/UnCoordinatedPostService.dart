@@ -23,6 +23,7 @@ class UncoordinatePostService {
 
     final data = body['data'];
     if (data != null && data is List) {
+      // ignore: unnecessary_cast
       return (data as List)
           .map((e) => PostModel.fromJson(e as Map<String, dynamic>))
           .toList();

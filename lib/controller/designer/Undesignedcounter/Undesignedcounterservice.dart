@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_cast
+
 import 'package:MedLife/constant/Apis.dart';
 import 'package:MedLife/errors/errorsHandler.dart';
 import 'package:MedLife/models/undesignedCounterModel.dart';

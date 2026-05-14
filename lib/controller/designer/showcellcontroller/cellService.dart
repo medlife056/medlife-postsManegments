@@ -24,6 +24,7 @@ class DesignerService {
     final data = body['data'];
     if (data == null || data is! List) return [];
 
+    // ignore: unnecessary_cast
     return (data as List)
         .map((e) => CellModel.fromJson(e as Map<String, dynamic>))
         .toList();
